@@ -1,37 +1,29 @@
-# Manjaro ARM GSI installer Script
+# Droidian installer Script
 
 OUTFD=/proc/self/fd/$1;
-VENDOR_DEVICE_PROP=`grep ro.product.vendor.device /vendor/build.prop | cut -d "=" -f 2 | awk '{print tolower($0)}'`;
 
 # ui_print <text>
 ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
 
-## GSI install
+## Droidian install
 cat /data/manjaro/data/rootfs.part.* > /data/rootfs.img
 
 # resize rootfs
-ui_print "Resizing rootfs to 16GB";
+ui_print "Resizing rootfs to 53GB";
 e2fsck -fy /data/rootfs.img
-resize2fs /data/rootfs.img 16G
+resize2fs /data/rootfs.img 53G
 
 mkdir /s;
 mkdir /r;
 
-# mount manjaro rootfs
+# mount droidian rootfs
 mount /data/rootfs.img /r;
 
-# mount android gsi
+# mount android rootfs
 mount /r/var/lib/lxc/android/android-rootfs.img /s
 
-# Set udev rules
-ui_print "Setting udev rules";
-cat /s/ueventd*.rc /vendor/ueventd*.rc | grep ^/dev | sed -e 's/^\/dev\///' | awk '{printf "ACTION==\"add\", KERNEL==\"%s\", OWNER=\"%s\", GROUP=\"%s\", MODE=\"%s\"\n",$1,$3,$4,$2}' | sed -e 's/\r//' > /data/70-manjaro.rules;
-
-# umount android gsi
+# umount android rootfs
 umount /s;
-
-# move udev rules inside rootfs
-mv /data/70-manjaro.rules /r/etc/udev/rules.d/70-$VENDOR_DEVICE_PROP.rules;
 
 # If we should flash the kernel, do it
 if [ -e "/r/boot/boot.img" ]; then
@@ -109,7 +101,7 @@ if [ -e "/r/boot/boot.img" ]; then
 
 fi
 
-# umount rootfs
+# umount droidian rootfs
 umount /r;
 
 # halium initramfs workaround,
