@@ -9,9 +9,12 @@ ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
 cat /data/manjaro/data/rootfs.part.* > /data/rootfs.img
 
 # resize rootfs
+# first get the remaining space on the partition
+AVAILABLE_SPACE=$(df /data | awk '/dev\/block\/sda/ {print $4}')
+IMG_SIZE=$(awk -v size="$AVAILABLE_SPACE" 'BEGIN { printf "%.1f", size - 0.5 }')
 ui_print "Resizing rootfs to 53GB";
 e2fsck -fy /data/rootfs.img
-resize2fs /data/rootfs.img 53G
+resize2fs /data/rootfs.img "$IMG_SIZE"
 
 mkdir /s;
 mkdir /r;
