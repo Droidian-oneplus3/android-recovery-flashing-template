@@ -11,8 +11,10 @@ cat /data/manjaro/data/rootfs.part.* > /data/rootfs.img
 # resize rootfs
 # first get the remaining space on the partition
 AVAILABLE_SPACE=$(df /data | awk '/dev\/block\/sda/ {print $4}')
+PRETTY_SIZE=$(df -h /data | awk '/dev\/block\/sda/ {print $4}')
+# then remove 0.5K from the size
 IMG_SIZE=$(awk -v size="$AVAILABLE_SPACE" 'BEGIN { printf "%.1f", size - 0.5 }')
-ui_print "Resizing rootfs to 53GB";
+ui_print "Resizing rootfs to $PRETTY_SIZE";
 e2fsck -fy /data/rootfs.img
 resize2fs /data/rootfs.img "$IMG_SIZE"
 
