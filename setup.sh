@@ -15,7 +15,7 @@ PRETTY_SIZE=$(df -h /data | awk '/dev\/block\/sda/ {print $4}')
 # then remove 100MB (102400KB) from the size
 # later on in case of kernel updates this storage might come in handy.
 # about the same amount is preserved for LVM images in the droidian--persistent and droidian--reserved partitions.
-IMG_SIZE=$(awk -v size="$AVAILABLE_SPACE" 'BEGIN { printf "%.1f", size - 102400 }')
+IMG_SIZE=$((AVAILABLE_SPACE - 102400))
 ui_print "Resizing rootfs to $PRETTY_SIZE";
 e2fsck -fy /data/rootfs.img
 resize2fs /data/rootfs.img "$IMG_SIZE"K
