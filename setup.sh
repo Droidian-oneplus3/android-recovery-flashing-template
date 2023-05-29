@@ -12,11 +12,13 @@ mv /data/droidian/data/rootfs.img /data/;
 AVAILABLE_SPACE=$(df /data | awk '/dev\/block\/sda/ {print $4}')
 PRETTY_SIZE=$(df -h /data | awk '/dev\/block\/sda/ {print $4}')
 
-# then remove 0.5K from the size
-IMG_SIZE=$(awk -v size="$AVAILABLE_SPACE" 'BEGIN { printf "%.1f", size - 0.5 }')
+# then remove 100MB (102400KB) from the size
+# later on in case of kernel updates this story might come in handy.
+# about the same amount is preserved for LVM images in the droidian--persistent and droidian--reserved partitions.
+IMG_SIZE=$(awk -v size="$AVAILABLE_SPACE" 'BEGIN { printf "%.1f", size - 102400 }')
 ui_print "Resizing rootfs to $PRETTY_SIZE";
 e2fsck -fy /data/rootfs.img
-resize2fs /data/rootfs.img "$IMG_SIZE"
+resize2fs /data/rootfs.img "$IMG_SIZE"K
 
 mkdir /r;
 
